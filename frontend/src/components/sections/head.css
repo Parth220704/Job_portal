@@ -1,0 +1,70 @@
+.hero {
+    padding: 80px 20px;
+    text-align: center;
+    font-family: 'Inter', sans-serif;
+    background-color: #ffffff;
+}
+
+/* Title */
+.hero-title {
+    font-size: 48px;
+    font-weight: 800;
+    color: #0f172a;
+    line-height: 1.15;
+    margin-bottom: 20px;
+}
+
+/* Highlight block */
+.highlight {
+    background: linear-gradient(90deg, #2563eb, #22c55e);
+    color: white;
+    padding: 6px 14px;
+    border-radius: 6px;
+    margin: 0 6px;
+    display: inline-block;
+}
+
+/* Subtitle */
+.hero-subtitle {
+    max-width: 720px;
+    margin: 0 auto 36px;
+    font-size: 16px;
+    color: #64748b;
+}
+
+/* Buttons container */
+.hero-actions {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+/* Buttons */
+.hero-btn {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 24px;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+/* Job button */
+.hero-btn.job {
+    background-color: #10b981;
+    color: white;
+}
+
+/* Hiring button */
+.hero-btn.hire {
+    background-color: #2563eb;
+    color: white;
+}
+
+/* Hover effects */
+.hero-btn:hover {
+    opacity: 0.9;
+}

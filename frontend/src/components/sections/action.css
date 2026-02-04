@@ -1,0 +1,116 @@
+.built-section {
+  background-color: #f8fafc;
+  padding: 80px 20px 40px;
+  text-align: center;
+}
+
+.built-title {
+  font-size: 32px;
+  font-weight: 700;
+  margin-bottom: 10px;
+  color: #111827;
+}
+
+.built-subtitle {
+  color: #64748b;
+  max-width: 700px;
+  margin: 0 auto 50px;
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+.choose-container {
+  display: flex;
+  gap: 24px;
+  justify-content: center;
+  align-items: stretch;
+  flex-wrap: nowrap; /* force one line */
+}
+
+.choose-card {
+  width: 320px;
+  padding: 35px 25px;
+  border-radius: 16px;
+  background: #ffffff;
+  border: 2px solid transparent;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.06);
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.35s ease;
+}
+
+.choose-card:hover {
+  transform: translateY(-10px);
+  border-color: var(--main-color);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+}
+
+.card-green { --main-color: #10b981; }
+.card-blue { --main-color: #2563eb; }
+.card-purple { --main-color: #8b5cf6; }
+
+.choose-icon {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 26px;
+  margin: 0 auto 15px;
+  color: white;
+}
+
+.choose-icon.green { background: #10b981; }
+.choose-icon.blue { background: #2563eb; }
+.choose-icon.purple { background: #8b5cf6; }
+
+.choose-card h3 {
+  font-size: 22px;
+  margin: 15px 0;
+  color: #111827;
+}
+
+.choose-card ul {
+  list-style: none;
+  padding: 0;
+  margin: 20px 0;
+}
+
+.choose-card ul li {
+  font-size: 15px;
+  color: #475569;
+  margin-bottom: 10px;
+}
+
+.choose-card ul li::before {
+  content: "✓ ";
+  color: #22c55e;
+  font-weight: bold;
+}
+
+.choose-btn {
+  width: 100%;
+  padding: 12px;
+  border-radius: 10px;
+  border: none;
+  color: white;
+  font-size: 15px;
+  cursor: pointer;
+  margin-top: 20px;
+}
+
+.green-btn { background: #10b981; }
+.blue-btn { background: #2563eb; }
+.purple-btn { background: #8b5cf6; }
+
+@media (max-width: 1024px) {
+  .choose-container {
+    flex-wrap: wrap;
+  }
+
+  .choose-card {
+    width: 100%;
+    max-width: 360px;
+  }
+}

@@ -1,0 +1,39 @@
+.footer {
+  background-color: #ffffff;
+  border-top: 1px solid #e5e7eb; /* 👈 THIS is the HR line */
+  padding: 25px 15px;
+}
+
+.footer-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.footer-logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.footer-icon {
+  background: #2563eb;
+  color: #ffffff;
+  padding: 6px;
+  border-radius: 6px;
+  font-size: 22px;
+}
+
+.footer-text {
+  font-size: 14px;
+  color: #6b7280;
+}
+.footer-hr {
+  border: none;
+  border-top: 1px solid #e5e7eb;
+  margin-bottom: 20px;
+}
