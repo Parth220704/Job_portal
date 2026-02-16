@@ -3,154 +3,138 @@ import {
   HiOutlineBuildingOffice,
   HiOutlineBriefcase,
   HiOutlineClipboardDocumentList,
+  HiOutlinePlusCircle,
 } from "react-icons/hi2";
 
 const RecruiterDashboard = ({ user }) => {
   return (
-    <div className="min-h-screen bg-gray-100 p-8">
+    <div className="min-h-screen bg-gray-50">
 
-      {/* Welcome Banner */}
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">
-          Welcome, {user?.name}! 👋
+      {/* Gradient Welcome Banner */}
+      <div className="bg-gradient-to-r from-blue-500 to-indigo-400 text-white px-8 py-10 shadow">
+
+        <h1 className="text-3xl font-bold">
+          Welcome back, {user?.name}! 👋
         </h1>
-        <p className="text-gray-600 mt-1">
-          Post jobs and manage applications
+
+        <p className="text-blue-100 mt-1">
+          Manage your jobs, applications, and company profile
         </p>
+
       </div>
 
-      {/* Cards Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
 
-        {/* Profile Information */}
-        <div className="bg-white rounded-xl shadow-sm border p-6">
+      <div className="p-8">
 
-          <div className="flex items-center gap-2 mb-2">
-            <HiOutlineUser size={22} />
-            <h2 className="text-xl font-semibold">
-              Profile Information
-            </h2>
-          </div>
+        {/* Top Stats Row */}
+        {/* <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
 
-          <p className="text-gray-500 text-sm mb-4">
-            Your account details
-          </p>
+          <StatCard
+            icon={<HiOutlineBriefcase size={24} />}
+            title="Total Jobs"
+            value="12"
+            color="from-blue-500 to-indigo-500"
+          />
 
-          <div className="space-y-3">
+          <StatCard
+            icon={<HiOutlineClipboardDocumentList size={24} />}
+            title="Applications"
+            value="48"
+            color="from-green-500 to-emerald-500"
+          />
+
+          <StatCard
+            icon={<HiOutlineUser size={24} />}
+            title="Candidates"
+            value="32"
+            color="from-purple-500 to-pink-500"
+          />
+
+          <StatCard
+            icon={<HiOutlinePlusCircle size={24} />}
+            title="Active Jobs"
+            value="5"
+            color="from-orange-500 to-red-500"
+          />
+
+        </div> */}
+
+
+        {/* Main Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+          {/* Profile Card */}
+          <DashboardCard
+            icon={<HiOutlineUser size={22} />}
+            title="Profile Information"
+            description="Your personal account details"
+            button="Edit Profile"
+          >
+
+            <Info label="Name" value={user?.name} />
+            <Info label="Email" value={user?.email} />
+           
 
             <div>
-              <p className="text-gray-500 text-sm">Full Name</p>
-              <p className="font-medium">{user?.name}</p>
-            </div>
-
-            <div>
-              <p className="text-gray-500 text-sm">Email</p>
-              <p className="font-medium">{user?.email}</p>
-            </div>
-
-            
-
-            <div>
-              <p className="text-gray-500 text-sm">Role</p>
-              <span className="inline-block bg-blue-600 text-white text-sm px-3 py-1 rounded-full">
+              <p className="text-sm text-gray-500">Role</p>
+              <span className="inline-block mt-1 bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-xs px-3 py-1 rounded-full">
                 {user?.role}
               </span>
             </div>
 
-          </div>
+          </DashboardCard>
 
-        </div>
 
-        {/* Company Profile */}
-        <div className="bg-white rounded-xl shadow-sm border p-6">
+          {/* Company Card */}
+          <DashboardCard
+            icon={<HiOutlineBuildingOffice size={22} />}
+            title="Company Profile"
+            description="Manage your company information"
+            button="Company Profile"
+          >
+            <p className="text-gray-600 text-sm">
+              Update company details, logo, and branding.
+            </p>
+          </DashboardCard>
 
-          <div className="flex items-center gap-2 mb-2">
-            <HiOutlineBuildingOffice size={22} />
-            <h2 className="text-xl font-semibold">
-              Company Profile
-            </h2>
-          </div>
 
-          <p className="text-gray-500 text-sm mb-4">
-            Manage your company information
-          </p>
+          {/* Post Job */}
+          <DashboardCard
+            icon={<HiOutlineBriefcase size={22} />}
+            title="Post a Job"
+            description="Create new job listings"
+            button="Post Job"
+          >
+            <p className="text-gray-600 text-sm">
+              Post vacancies and attract the best candidates.
+            </p>
+          </DashboardCard>
 
-          <p className="text-gray-600 mb-4">
-            Set up and manage your company profile for job seekers.
-          </p>
 
-          <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
-            Company Profile
-          </button>
+          {/* My Jobs */}
+          <DashboardCard
+            icon={<HiOutlineBriefcase size={22} />}
+            title="My Jobs"
+            description="Manage job postings"
+            button="View Jobs"
+          >
+            <p className="text-gray-600 text-sm">
+              Edit, close, or update job listings.
+            </p>
+          </DashboardCard>
 
-        </div>
 
-        {/* Post Job */}
-        <div className="bg-white rounded-xl shadow-sm border p-6">
-
-          <div className="flex items-center gap-2 mb-2">
-            <HiOutlineBriefcase size={22} />
-            <h2 className="text-xl font-semibold">
-              Post a Job
-            </h2>
-          </div>
-
-          <p className="text-gray-500 text-sm mb-4">
-            Create new job listings
-          </p>
-
-          <p className="text-gray-600 mb-4">
-            Post job vacancies and find the right candidates.
-          </p>
-
-          <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
-            Post Job
-          </button>
-
-        </div>
-
-        {/* My Jobs */}
-        <div className="bg-white rounded-xl shadow-sm border p-6">
-
-          <h2 className="text-xl font-semibold mb-1">
-            My Jobs
-          </h2>
-
-          <p className="text-gray-500 text-sm mb-4">
-            Manage posted jobs
-          </p>
-
-          <p className="text-gray-600 mb-4">
-            View, edit, and manage your job postings.
-          </p>
-
-          <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
-            View Jobs
-          </button>
-
-        </div>
-
-        {/* Applications */}
-        <div className="bg-white rounded-xl shadow-sm border p-6">
-
-          <div className="flex items-center gap-2 mb-2">
-            <HiOutlineClipboardDocumentList size={22} />
-            <h2 className="text-xl font-semibold">
-              Applications
-            </h2>
-          </div>
-
-          <p className="text-gray-500 text-sm mb-4">
-            Review job applications
-          </p>
-
-          <p className="text-gray-600 mb-4">
-            View and manage applications from job seekers.
-          </p>
-
-          <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
-            View Applications
-          </button>
+          {/* Applications */}
+          <DashboardCard
+            icon={<HiOutlineClipboardDocumentList size={22} />}
+            title="Applications"
+            description="Review candidate applications"
+            button="View Applications"
+          >
+            <p className="text-gray-600 text-sm">
+              Track and manage incoming applications.
+            </p>
+          </DashboardCard>
 
         </div>
 
@@ -161,3 +145,57 @@ const RecruiterDashboard = ({ user }) => {
 };
 
 export default RecruiterDashboard;
+
+
+
+/* Reusable Components */
+
+
+const StatCard = ({ icon, title, value, color }) => (
+  <div className="bg-white rounded-xl shadow-sm border p-5 flex items-center justify-between">
+
+    <div>
+      <p className="text-gray-500 text-sm">{title}</p>
+      <h2 className="text-2xl font-bold text-gray-800">{value}</h2>
+    </div>
+
+    <div className={`p-3 rounded-lg text-white bg-gradient-to-r ${color}`}>
+      {icon}
+    </div>
+
+  </div>
+);
+
+
+
+const DashboardCard = ({ icon, title, description, button, children }) => (
+  <div className="bg-white rounded-xl shadow-sm border p-6 hover:shadow-md transition">
+
+    <div className="flex items-center gap-2 mb-2 text-gray-800">
+      {icon}
+      <h2 className="text-lg font-semibold">{title}</h2>
+    </div>
+
+    <p className="text-gray-500 text-sm mb-4">
+      {description}
+    </p>
+
+    <div className="space-y-3 mb-4">
+      {children}
+    </div>
+
+    <button className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-4 py-2 rounded-lg text-sm hover:opacity-90 transition">
+      {button}
+    </button>
+
+  </div>
+);
+
+
+
+const Info = ({ label, value }) => (
+  <div>
+    <p className="text-sm text-gray-500">{label}</p>
+    <p className="font-medium text-gray-800">{value}</p>
+  </div>
+);
