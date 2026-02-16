@@ -91,6 +91,7 @@ const RecruiterDashboard = ({ user }) => {
             title="Company Profile"
             description="Manage your company information"
             button="Company Profile"
+            to="/recruiter/company-profile"
           >
             <p className="text-gray-600 text-sm">
               Update company details, logo, and branding.
@@ -104,6 +105,7 @@ const RecruiterDashboard = ({ user }) => {
             title="Post a Job"
             description="Create new job listings"
             button="Post Job"
+             to="/recruiter/post-job"
           >
             <p className="text-gray-600 text-sm">
               Post vacancies and attract the best candidates.
@@ -117,6 +119,7 @@ const RecruiterDashboard = ({ user }) => {
             title="My Jobs"
             description="Manage job postings"
             button="View Jobs"
+            to="/recruiter/my-jobs"
           >
             <p className="text-gray-600 text-sm">
               Edit, close, or update job listings.
@@ -130,6 +133,7 @@ const RecruiterDashboard = ({ user }) => {
             title="Applications"
             description="Review candidate applications"
             button="View Applications"
+             to="/recruiter/applications"
           >
             <p className="text-gray-600 text-sm">
               Track and manage incoming applications.
@@ -168,28 +172,37 @@ const StatCard = ({ icon, title, value, color }) => (
 
 
 
-const DashboardCard = ({ icon, title, description, button, children }) => (
-  <div className="bg-white rounded-xl shadow-sm border p-6 hover:shadow-md transition">
+import { useNavigate } from "react-router-dom";
 
-    <div className="flex items-center gap-2 mb-2 text-gray-800">
-      {icon}
-      <h2 className="text-lg font-semibold">{title}</h2>
+const DashboardCard = ({ icon, title, description, button, to, children }) => {
+  const navigate = useNavigate();
+
+  return (
+    <div className="bg-white rounded-xl shadow-sm border p-6 hover:shadow-md transition">
+
+      <div className="flex items-center gap-2 mb-2 text-gray-800">
+        {icon}
+        <h2 className="text-lg font-semibold">{title}</h2>
+      </div>
+
+      <p className="text-gray-500 text-sm mb-4">
+        {description}
+      </p>
+
+      <div className="space-y-3 mb-4">
+        {children}
+      </div>
+
+      <button
+        onClick={() => navigate(to)}
+        className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-4 py-2 rounded-lg text-sm hover:opacity-90 transition"
+      >
+        {button}
+      </button>
+
     </div>
-
-    <p className="text-gray-500 text-sm mb-4">
-      {description}
-    </p>
-
-    <div className="space-y-3 mb-4">
-      {children}
-    </div>
-
-    <button className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-4 py-2 rounded-lg text-sm hover:opacity-90 transition">
-      {button}
-    </button>
-
-  </div>
-);
+  );
+};
 
 
 
