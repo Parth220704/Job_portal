@@ -4,6 +4,8 @@ import dotenv from "dotenv";
 import connectDB from "../config/db.js";
 import authRoutes from "../routes/authRoutes.js";
 import userRoutes from "../routes/userRoutes.js";
+import skillRoutes from "../routes/skillRoutes.js";
+import companyRoutes from "../routes/companyRoutes.js";
 
 dotenv.config();
 
@@ -16,6 +18,8 @@ app.use(express.json());
 
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
+app.use("/api/skills", skillRoutes);
+app.use("/api/company", companyRoutes);
 
 
 app.get("/", (req, res) => {
