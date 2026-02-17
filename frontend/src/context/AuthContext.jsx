@@ -1,5 +1,6 @@
 import { createContext, useState, useEffect } from "react";
 import { getToken, setToken, removeToken } from "../api/token";
+import { Navigate } from "react-router-dom";
 
 export const AuthContext = createContext();
 
@@ -28,6 +29,7 @@ const AuthProvider = ({ children }) => {
 
     setUser(null);
     localStorage.removeItem("user");
+    
 
     setIsLoggedIn(false);
   };

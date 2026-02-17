@@ -1,4 +1,4 @@
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate  } from "react-router-dom";
 import {
   HiOutlineSquares2X2,
   HiOutlineBuildingOffice,
@@ -14,6 +14,10 @@ import { useContext } from "react";
 import { AuthContext } from "../../../context/AuthContext";
 
 const RecruiterNavbar = () => {
+
+  const navigate = useNavigate();
+
+
   const location = useLocation();
   const { user, logout } = useContext(AuthContext);
 
@@ -111,7 +115,10 @@ const RecruiterNavbar = () => {
 
         {/* Logout */}
         <button
-          onClick={logout}
+           onClick={() => {
+              logout();
+              navigate("/login");
+            }}
           className="p-2 border rounded-lg hover:bg-gray-100 transition"
         >
           <FiLogOut size={18} />
