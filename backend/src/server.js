@@ -6,6 +6,7 @@ import authRoutes from "../routes/authRoutes.js";
 import userRoutes from "../routes/userRoutes.js";
 import skillRoutes from "../routes/skillRoutes.js";
 import companyRoutes from "../routes/companyRoutes.js";
+import jobRoutes from "../routes/jobRoutes.js";
 
 dotenv.config();
 
@@ -20,6 +21,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/skills", skillRoutes);
 app.use("/api/company", companyRoutes);
+app.use("/api/jobs", jobRoutes);
 
 
 app.get("/", (req, res) => {
