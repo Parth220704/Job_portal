@@ -7,6 +7,8 @@ import userRoutes from "../routes/userRoutes.js";
 import skillRoutes from "../routes/skillRoutes.js";
 import companyRoutes from "../routes/companyRoutes.js";
 import jobRoutes from "../routes/jobRoutes.js";
+import applicationRoutes from "../routes/applicationRoutes.js";
+import jobSeekerProfileRoutes from "../routes/jobSeekerProfileRoutes.js";
 
 dotenv.config();
 
@@ -22,6 +24,8 @@ app.use("/api/users", userRoutes);
 app.use("/api/skills", skillRoutes);
 app.use("/api/company", companyRoutes);
 app.use("/api/jobs", jobRoutes);
+app.use("/api/applications", applicationRoutes);
+app.use("/api/jobseeker-profile", jobSeekerProfileRoutes);
 
 
 app.get("/", (req, res) => {
