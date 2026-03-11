@@ -54,17 +54,40 @@ export const getAllJobs = async (req, res) => {
 
   try {
 
-    const jobs = await Job.find({ status: "active" })
+    const { title, skill, location } = req.query;
+
+    let filter = { status: "active" };
+
+    // filter by job title
+    if (title) {
+      filter.title = { $regex: title, $options: "i" };
+    }
+
+    // filter by skill
+    if (skill) {
+      filter.requiredSkills = { $in: [skill] };
+    }
+
+    // filter by location
+    if (location) {
+      filter.location = { $regex: location, $options: "i" };
+    }
+
+    const jobs = await Job.find(filter)
       .populate("companyId", "companyName location")
       .sort({ createdAt: -1 });
 
-    res.json(jobs);
+    res.json({
+      count: jobs.length,
+      data: jobs
+    });
 
   }
   catch (error) {
 
     res.status(500).json({
-      message: "Failed to fetch jobs"
+      message: "Failed to fetch jobs",
+      error: error.message
     });
 
   }

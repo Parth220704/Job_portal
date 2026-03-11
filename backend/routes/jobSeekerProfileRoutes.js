@@ -3,7 +3,8 @@ import express from "express";
 import {
   createProfile,
   getMyProfile,
-  updateProfile
+  updateProfile,
+  getMyApplications
 } from "../controllers/jobSeekerProfileController.js";
 
 import { protect } from "../middleware/authMiddleware.js";
@@ -21,6 +22,9 @@ router.get("/me", protect, getMyProfile);
 
 /* update profile */
 router.put("/", protect, updateProfile);
+
+// job seeker view applied jobs
+router.get("/my", protect, getMyApplications);
 
 
 export default router;

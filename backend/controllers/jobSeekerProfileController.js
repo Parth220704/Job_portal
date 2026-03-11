@@ -84,3 +84,36 @@ export const updateProfile = async (req, res) => {
     });
   }
 };
+
+export const getMyApplications = async (req, res) => {
+  try {
+
+    const jobSeekerId = req.user._id;
+
+    const applications = await Application.find({ jobSeekerId })
+      .populate({
+        path: "jobId",
+        select: "title location salary requiredSkills companyId"
+      })
+      .populate({
+        path: "recruiterId",
+        select: "name email"
+      })
+      .sort({ appliedAt: -1 });
+
+    res.status(200).json({
+      count: applications.length,
+      data: applications
+    });
+
+  } catch (error) {
+
+    console.error(error);
+
+    res.status(500).json({
+      message: "Failed to fetch applications",
+      error: error.message
+    });
+
+  }
+};

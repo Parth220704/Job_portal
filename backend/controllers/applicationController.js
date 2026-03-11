@@ -11,6 +11,16 @@ export const applyForJob = async (req, res) => {
     const { jobId } = req.body;
     const jobSeekerId = req.user._id;
 
+    const profile = await JobSeekerProfile.findOne({
+      userId: jobSeekerId
+    })
+
+    if (!profile || !profile.resumeUrl) {
+      return res.status(400).json({
+        message: "Please upload resume before applying"
+      })
+    }
+
     // Check if job exists
     const job = await Job.findById(jobId);
 
