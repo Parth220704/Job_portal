@@ -26,6 +26,7 @@ app.use("/api/company", companyRoutes);
 app.use("/api/jobs", jobRoutes);
 app.use("/api/applications", applicationRoutes);
 app.use("/api/jobseeker-profile", jobSeekerProfileRoutes);
+app.use("/uploads", express.static("uploads"));
 
 
 app.get("/", (req, res) => {

@@ -33,6 +33,7 @@ const Profile = () => {
   const [education, setEducation] = useState([]);
   const [experience, setExperience] = useState([]);
   const [resumeFile, setResumeFile] = useState(null);
+  const [removeResume, setRemoveResume] = useState(false);
 
   /* ==============================
       LOAD PROFILE DATA
@@ -58,6 +59,11 @@ const Profile = () => {
         setSkills(data.skills || []);
         setEducation(data.education || []);
         setExperience(data.experience || []);
+        setResumeFile(
+          data.resumeUrl
+            ? { name: data.resumeName.split("/").pop(), url: data.resumeUrl }
+            : null,
+        );
       } catch (error) {
         console.log("Profile not found yet");
       }
@@ -205,6 +211,7 @@ const Profile = () => {
 
   const deleteResume = () => {
     setResumeFile(null);
+    setRemoveResume(true);
   };
 
   /* ==============================
@@ -213,19 +220,24 @@ const Profile = () => {
 
   const handleSaveProfile = async () => {
     try {
-      console.log(formData.dob + summary);
-      const payload = {
-        phone: formData.phone,
-        city: formData.city,
-        gender: formData.gender,
-        DOB: formData.dob,
-        summary,
-        skills,
-        education,
-        experience,
-      };
+      const form = new FormData();
 
-      await updateProfile(payload);
+      form.append("phone", formData.phone);
+      form.append("city", formData.city);
+      form.append("gender", formData.gender);
+      form.append("DOB", formData.dob);
+      form.append("summary", summary);
+
+      form.append("skills", JSON.stringify(skills));
+      form.append("education", JSON.stringify(education));
+      form.append("experience", JSON.stringify(experience));
+
+      if (resumeFile) {
+        form.append("resume", resumeFile);
+      }
+      form.append("removeResume", removeResume);
+
+      await updateProfile(form);
 
       alert("Profile updated successfully");
     } catch (error) {
@@ -581,7 +593,13 @@ const Profile = () => {
         {/* Resume File Display */}
         {resumeFile && (
           <div className="flex items-center justify-between border rounded-lg px-4 py-2">
-            <span className="text-sm text-gray-700">{resumeFile.name}</span>
+            <a
+              href={`http://localhost:5000/${resumeFile.url}`}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {resumeFile.name}
+            </a>
 
             <button
               onClick={deleteResume}

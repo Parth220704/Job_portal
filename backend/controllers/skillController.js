@@ -32,9 +32,12 @@ export const addSkill = async (req, res) => {
 
   try {
 
-    const { name } = req.body;
+    const { name, learningLink } = req.body;
 
-    const skill = await Skill.create({ name });
+    const skill = await Skill.create({
+      name,
+      learningLink
+    });
 
     res.status(201).json(skill);
 

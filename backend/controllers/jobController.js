@@ -1,5 +1,7 @@
 import Job from "../models/Job.js";
 import Company from "../models/Company.js";
+import Skill from "../models/Skills.js";
+import JobSeekerProfile from "../models/JobSeeker.js";
 
 
 // CREATE JOB
@@ -123,31 +125,71 @@ export const getMyJobs = async (req, res) => {
 
 // GET SINGLE JOB
 export const getJobById = async (req, res) => {
-
   try {
 
     const job = await Job.findById(req.params.id)
       .populate("companyId", "companyName location");
 
     if (!job) {
-
       return res.status(404).json({
         message: "Job not found"
       });
-
     }
 
-    res.json(job);
+    // Get logged in user profile
+    const profile = await JobSeekerProfile.findOne({
+      userId: req.user?._id
+    });
+
+    const userSkills = profile?.skills || [];
+    const requiredSkills = job.requiredSkills || [];
+
+    // normalize function
+    const normalize = (skill) =>
+      skill.toString().trim().toLowerCase();
+
+    // convert user skills into normalized set
+    const userSkillSet = new Set(userSkills.map(normalize));
+
+    // matched skills
+    const matchedSkills = requiredSkills.filter(skill =>
+      userSkillSet.has(normalize(skill))
+    );
+
+    // missing skills
+    const missingSkills = requiredSkills.filter(skill =>
+      !userSkillSet.has(normalize(skill))
+    );
+
+    // learning resources from Skill collection
+    const resources = await Skill.find({
+      name: { $in: missingSkills }
+    });
+
+    // percentage calculation
+    const matchPercentage =
+      requiredSkills.length === 0
+        ? 0
+        : Math.round((matchedSkills.length / requiredSkills.length) * 100);
+
+    res.json({
+      job,
+      matchedSkills,
+      missingSkills,
+      resources,
+      matchPercentage,
+      profile
+    });
 
   }
   catch (error) {
 
     res.status(500).json({
-      message: "Failed to fetch job"
+      message: "Failed to fetch job",
+      error: error.message
     });
 
   }
-
 };
 
 

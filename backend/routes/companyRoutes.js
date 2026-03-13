@@ -4,7 +4,8 @@ import {
   createCompany,
   getMyCompany,
   updateCompany,
-  getCompanyById
+  getCompanyById,
+  getCompanyJobs
 } from "../controllers/companyController.js";
 
 import { protect } from "../middleware/authMiddleware.js";
@@ -23,8 +24,13 @@ router.get("/my-company", protect, getMyCompany);
 // update company
 router.put("/", protect, updateCompany);
 
+//get jobs of a company (for job seeker)
+router.get("/:id/jobs", getCompanyJobs);
+
 // get company details (for job seeker)
 router.get("/:id", protect, getCompanyById);
+
+
 
 
 export default router;

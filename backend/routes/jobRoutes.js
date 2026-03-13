@@ -17,7 +17,7 @@ const router = express.Router();
 // public
 router.get("/", getAllJobs);
 
-router.get("/:id", getJobById);
+router.get("/:id", protect, getJobById);
 
 
 // recruiter only

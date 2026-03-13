@@ -74,3 +74,43 @@ export const updateCompany = async (companyData) => {
   }
 
 };
+
+// GET COMPANY BY ID
+export const getCompanyById = async (companyId) => {
+
+  try {
+
+    const response = await api.get(`/company/${companyId}`);
+
+    return response.data.data;
+
+  } catch (error) {
+
+    if (error.response?.data?.message) {
+      throw new Error(error.response.data.message);
+    }
+
+    throw new Error("Failed to fetch company details");
+
+  }
+
+};
+
+
+
+// GET JOBS BY COMPANY
+export const getCompanyJobs = async (companyId) => {
+
+  try {
+
+    const response = await api.get(`/company/${companyId}/jobs`);
+
+    return response.data.data;
+
+  } catch (error) {
+
+    throw new Error("Failed to fetch company jobs");
+
+  }
+
+};

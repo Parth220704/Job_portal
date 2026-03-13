@@ -18,6 +18,8 @@ import BrowseJobs from './components/sections/jobSeeker/BrowseJobs';
 import MatchJobs from './components/sections/jobSeeker/MatchJobs';
 import JSApplications from './components/sections/jobSeeker/Applications';
 import Profile from './components/sections/jobSeeker/Profile';
+import JobDetails from './components/sections/jobSeeker/JobDetails';
+import CompanyDetails from './components/sections/jobSeeker/CompanyDetails';
 
 import './App.css'
 const App = () => {
@@ -43,6 +45,10 @@ const App = () => {
           <Route path="dashboard" element={<JobSeekerDashboard />} />
 
           <Route path="jobs" element={<BrowseJobs />} />
+
+          <Route path="jobs/:id" element={<JobDetails />} />
+
+          <Route path="companies/:id" element={<CompanyDetails />} />
 
           <Route path="matches" element={<MatchJobs />} />
 

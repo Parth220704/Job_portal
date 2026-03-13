@@ -1,4 +1,5 @@
 import JobSeekerProfile from "../models/JobSeeker.js";
+import fs from "fs";
 
 
 /*
@@ -64,12 +65,42 @@ UPDATE PROFILE
 export const updateProfile = async (req, res) => {
   try {
 
+    let updateData = {
+      phone: req.body.phone,
+      city: req.body.city,
+      gender: req.body.gender,
+      DOB: req.body.DOB,
+      summary: req.body.summary,
+      skills: JSON.parse(req.body.skills || "[]"),
+      education: JSON.parse(req.body.education || "[]"),
+      experience: JSON.parse(req.body.experience || "[]"),
+      updatedAt: Date.now()
+    };
+
+    // If resume uploaded
+    if (req.file) {
+      if (req.file) {
+        updateData.resumeUrl = req.file.path;
+        updateData.resumeName = req.file.originalname;
+      }
+    }
+    if (req.body.removeResume === "true") {
+
+  const profile = await JobSeekerProfile.findOne({ userId: req.user._id });
+
+  if (profile?.resumeUrl) {
+    fs.unlink(profile.resumeUrl, (err) => {
+      if (err) console.log("Failed to delete resume file");
+    });
+  }
+
+  updateData.resumeUrl = "";
+  updateData.resumeName = "";
+}
+
     const profile = await JobSeekerProfile.findOneAndUpdate(
       { userId: req.user._id },
-      {
-        ...req.body,
-        updatedAt: Date.now()
-      },
+      updateData,
       { new: true }
     );
 
@@ -79,6 +110,7 @@ export const updateProfile = async (req, res) => {
     });
 
   } catch (error) {
+    console.error(error);
     res.status(500).json({
       message: "Server error"
     });

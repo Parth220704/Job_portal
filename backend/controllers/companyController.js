@@ -1,4 +1,5 @@
 import Company from "../models/Company.js";
+import Job from "../models/Job.js";
 
 
 // CREATE COMPANY
@@ -140,4 +141,33 @@ export const getCompanyById = async (req, res) => {
     });
 
   }
+};
+
+export const getCompanyJobs = async (req, res) => {
+
+  try {
+
+    const { id } = req.params;
+
+    const jobs = await Job.find({
+      companyId: id,
+      status: "active"
+    })
+    .sort({ createdAt: -1 });
+
+    res.status(200).json({
+      message: "Company jobs fetched successfully",
+      count: jobs.length,
+      data: jobs
+    });
+
+  } catch (error) {
+
+    res.status(500).json({
+      message: "Failed to fetch company jobs",
+      error: error.message
+    });
+
+  }
+
 };

@@ -6,6 +6,7 @@ import {
   updateProfile,
   getMyApplications
 } from "../controllers/jobSeekerProfileController.js";
+import uploadResume from "../middleware/uploadResume.js";
 
 import { protect } from "../middleware/authMiddleware.js";
 
@@ -21,7 +22,7 @@ router.get("/me", protect, getMyProfile);
 
 
 /* update profile */
-router.put("/", protect, updateProfile);
+router.put("/", protect, uploadResume.single("resume"),updateProfile);
 
 // job seeker view applied jobs
 router.get("/my", protect, getMyApplications);

@@ -6,10 +6,13 @@ const skillSchema = new mongoose.Schema({
     required: true,
     unique: true,
     trim: true
-  }
-});
+  },
 
-// // Index for fast search
-// skillSchema.index({ name: 1 });
+  learningLink: {
+    type: String,
+    default: ""
+  }
+
+});
 
 export default mongoose.model("Skill", skillSchema);

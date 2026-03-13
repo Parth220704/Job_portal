@@ -36,21 +36,20 @@ GET ALL JOBS (Public)
 GET /api/jobs
 ========================================
 */
-export const getAllJobs = async () => {
-
+export const getAllJobs = async (filters = {}) => {
   try {
 
-    const response = await api.get("/jobs");
+    const response = await api.get("/jobs", {
+      params: filters
+    });
 
     return response.data;
 
-  }
-  catch (error) {
+  } catch (error) {
 
     throw new Error("Failed to fetch jobs");
 
   }
-
 };
 
 

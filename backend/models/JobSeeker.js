@@ -71,6 +71,9 @@ const jobSeekerProfileSchema = new mongoose.Schema({
     type: String,
     maxlength: 255
   },
+  resumeName: {
+  type: String
+},
 
   createdAt: {
     type: Date,
