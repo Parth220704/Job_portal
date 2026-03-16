@@ -1,12 +1,14 @@
 import { useEffect, useState, useContext } from "react";
 import { getAllJobs } from "../../../api/job";
-import { getMyProfile } from "../../../api/profile";
+import { getMyProfile,getMyApplications } from "../../../api/profile";
+import { applyForJob } from "../../../api/application"; // 👈 new
 import { AuthContext } from "../../../context/AuthContext";
 import {
   HiOutlineMapPin,
   HiOutlineBriefcase,
   HiOutlineMagnifyingGlass,
   HiOutlineBuildingOffice,
+  HiOutlineWrenchScrewdriver
 } from "react-icons/hi2";
 import { useNavigate } from "react-router-dom";
 
@@ -16,16 +18,16 @@ const BrowseJobs = () => {
 
   const [jobs, setJobs] = useState([]);
   const [profile, setProfile] = useState(null);
+  const [appliedJobIds, setAppliedJobIds] = useState(new Set()); // 👈 track applied
+  const [applyingJobId, setApplyingJobId] = useState(null);      // 👈 loading per job
 
-  const [filters, setFilters] = useState({
-    title: "",
-    location: "",
-  });
+  const [filters, setFilters] = useState({ title: "", location: "", skill: "" });
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     loadJobs();
     loadProfile();
+    loadMyApplications(); // 👈 fetch applied jobs on mount
   }, []);
 
   const loadJobs = async () => {
@@ -42,39 +44,52 @@ const BrowseJobs = () => {
     }
   };
 
-  useEffect(() => {
-    const delay = setTimeout(() => {
-      fetchJobs(filters);
-    }, 500); // wait 500ms after typing
+  // 👇 Fetch jobs the user has already applied to
+const loadMyApplications = async () => {
+  try {
+    const res = await getMyApplications();
+    const applications = res.data; // 👈 extract the array
+    const ids = new Set(applications.map((app) => app.jobId?._id ?? app.jobId));
+    setAppliedJobIds(ids);
+  } catch (err) {
+    console.error("Failed to load applications:", err);
+    setAppliedJobIds(new Set());
+  }
+};
 
+  useEffect(() => {
+    const delay = setTimeout(() => fetchJobs(filters), 500);
     return () => clearTimeout(delay);
   }, [filters]);
 
-  const handleSearch = async () => {
-    const data = await getAllJobs(filters);
-
-    setJobs(data.data);
-  };
-
   const fetchJobs = async (filterData = filters) => {
     try {
-      setLoading(true); // start loading
-
+      setLoading(true);
       const data = await getAllJobs(filterData);
-
       setJobs(data.data);
     } catch (error) {
       console.log(error);
     } finally {
-      setLoading(false); // stop loading
+      setLoading(false);
     }
   };
 
   const handleChange = (e) => {
-    setFilters({
-      ...filters,
-      [e.target.name]: e.target.value,
-    });
+    setFilters({ ...filters, [e.target.name]: e.target.value });
+  };
+
+  // 👇 Handle apply click
+  const handleApply = async (jobId) => {
+    try {
+      setApplyingJobId(jobId);
+      await applyForJob(jobId);
+      setAppliedJobIds((prev) => new Set([...prev, jobId])); // mark as applied locally
+    } catch (error) {
+      console.error(error);
+      alert(error?.response?.data?.message || "Failed to apply");
+    } finally {
+      setApplyingJobId(null);
+    }
   };
 
   return (
@@ -84,7 +99,6 @@ const BrowseJobs = () => {
         <HiOutlineBriefcase className="text-green-600" size={24} />
         <h1 className="text-2xl font-semibold">Browse Jobs</h1>
       </div>
-
       <p className="text-gray-500 mb-6">Find your next opportunity</p>
 
       {/* Search */}
@@ -99,7 +113,16 @@ const BrowseJobs = () => {
             className="px-2 py-2 w-full outline-none"
           />
         </div>
-
+        <div className="flex items-center border rounded px-3 w-full">
+          <HiOutlineWrenchScrewdriver className="text-gray-400" />
+          <input
+            name="skill"
+            placeholder="Skill (e.g. React)..."
+            value={filters.skill}
+            onChange={handleChange}
+            className="px-2 py-2 w-full outline-none"
+          />
+        </div>
         <div className="flex items-center border rounded px-3 w-full">
           <HiOutlineMapPin className="text-gray-400" />
           <input
@@ -110,9 +133,8 @@ const BrowseJobs = () => {
             className="px-2 py-2 w-full outline-none"
           />
         </div>
-
         <button
-          onClick={handleSearch}
+          onClick={() => fetchJobs()}
           className="bg-green-600 text-white px-5 rounded flex items-center gap-1"
         >
           <HiOutlineMagnifyingGlass />
@@ -120,21 +142,17 @@ const BrowseJobs = () => {
         </button>
       </div>
 
-      {/* Loading */}
       {loading && (
         <p className="text-center text-gray-500 mb-4">Loading jobs...</p>
       )}
 
-      {/* No Jobs Found */}
       {!loading && jobs.length === 0 && (
         <div className="text-center py-20">
           <HiOutlineBriefcase
             size={50}
             className="mx-auto text-gray-300 mb-4"
           />
-
           <h2 className="text-xl font-semibold text-gray-700">No Jobs Found</h2>
-
           <p className="text-gray-500 mt-2">
             Try adjusting your search keywords or location
           </p>
@@ -144,66 +162,84 @@ const BrowseJobs = () => {
       {/* Job Cards */}
       {!loading && jobs.length > 0 && (
         <div className="grid md:grid-cols-2 gap-6">
-          {jobs.map((job) => (
-            <div
-              key={job._id}
-              className="border rounded-xl p-5 shadow-sm hover:shadow-md transition"
-            >
-              <h2
-                onClick={() => navigate(`/jobseeker/jobs/${job._id}`)}
-                className="text-lg font-semibold cursor-pointer hover:text-green-600"
-              >
-                {job.title}
-              </h2>
+          {jobs.map((job) => {
+            const alreadyApplied = appliedJobIds.has(job._id);
+            const isApplying = applyingJobId === job._id;
 
-              <div className="flex items-center gap-1 text-green-600 text-sm mt-1">
+            return (
+              <div
+                key={job._id}
+                className="border rounded-xl p-5 shadow-sm hover:shadow-md transition"
+              >
+                <h2
+                  onClick={() => navigate(`/jobseeker/jobs/${job._id}`)}
+                  className="text-lg font-semibold cursor-pointer hover:text-green-600"
+                >
+                  {job.title}
+                </h2>
+
                 <div
                   onClick={() =>
                     navigate(`/jobseeker/companies/${job.companyId._id}`)
                   }
-                  className="text-green-600 cursor-pointer hover:underline flex items-center gap-1 text-sm"
+                  className="text-green-600 cursor-pointer hover:underline flex items-center gap-1 text-sm mt-1"
                 >
                   <HiOutlineBuildingOffice />
                   {job.companyId?.companyName}
                 </div>
-              </div>
 
-              <p className="text-gray-500 mt-3">
-                {job.description?.slice(0, 120)}...
-              </p>
+                <p className="text-gray-500 mt-3">
+                  {job.description?.slice(0, 120)}...
+                </p>
 
-              <div className="flex items-center gap-1 text-sm text-gray-500 mt-2">
-                <HiOutlineMapPin />
-                {job.location}
-              </div>
+                <div className="flex items-center gap-1 text-sm text-gray-500 mt-2">
+                  <HiOutlineMapPin />
+                  {job.location}
 
-              {/* Skills */}
-              <div className="flex flex-wrap gap-2 mt-3">
-                {job.requiredSkills?.map((skill, index) => (
-                  <span
-                    key={index}
-                    className="bg-gray-100 px-2 py-1 text-xs rounded"
-                  >
-                    {skill}
+                  <span className="flex items-center gap-1 ms-3">
+                    <HiOutlineBriefcase />
+                    {job.minExperience} - {job.maxExperience} years
                   </span>
-                ))}
-              </div>
+                </div>
 
-              {/* Apply Button */}
-              {profile?.resumeUrl ? (
-                <button className="mt-4 w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700">
-                  Apply Job
-                </button>
-              ) : (
-                <button
-                  disabled
-                  className="mt-4 w-full border border-red-500 text-red-500 py-2 rounded"
-                >
-                  Upload Resume to Apply
-                </button>
-              )}
-            </div>
-          ))}
+                <div className="flex flex-wrap gap-2 mt-3">
+                  {job.requiredSkills?.map((skill, index) => (
+                    <span
+                      key={index}
+                      className="bg-gray-100 px-2 py-1 text-xs rounded"
+                    >
+                      {skill}
+                    </span>
+                  ))}
+                </div>
+
+                {/* 👇 Smart Apply Button */}
+                {!profile?.resumeUrl ? (
+                  <button
+                    className="mt-4 w-full border border-red-500 text-red-500 py-2 rounded"
+                    onClick={() => navigate("/jobseeker/profile")}
+                  >
+                    Upload Resume to Apply
+                  </button>
+                ) : alreadyApplied ? (
+                  <button
+                    onClick={() => navigate(`/jobseeker/applications`)}
+                    className="mt-4 w-full bg-gray-100 text-gray-500 py-2 rounded"
+                  >
+                    ✓ Applied
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => handleApply(job._id)}
+                    disabled={isApplying}
+                    className="mt-4 w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 disabled:opacity-60"
+                  >
+                    {isApplying ? "Applying..." : "Apply Job"}
+                  </button>
+                )}
+              </div>
+            );
+          })}
         </div>
       )}
     </div>

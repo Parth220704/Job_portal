@@ -16,10 +16,8 @@ const router = express.Router();
 // create company
 router.post("/", protect, createCompany);
 
-
 // get recruiter company
 router.get("/my-company", protect, getMyCompany);
-
 
 // update company
 router.put("/", protect, updateCompany);
@@ -29,8 +27,5 @@ router.get("/:id/jobs", getCompanyJobs);
 
 // get company details (for job seeker)
 router.get("/:id", protect, getCompanyById);
-
-
-
 
 export default router;

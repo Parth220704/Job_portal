@@ -67,7 +67,10 @@ export const getAllJobs = async (req, res) => {
 
     // filter by skill
     if (skill) {
-      filter.requiredSkills = { $in: [skill] };
+      // filter by skill
+      if (skill) {
+        filter.requiredSkills = { $elemMatch: { $regex: skill, $options: "i" } };
+      }
     }
 
     // filter by location

@@ -1,5 +1,6 @@
 import JobSeekerProfile from "../models/JobSeeker.js";
 import fs from "fs";
+import Application from "../models/Application.js";
 
 
 /*
@@ -86,17 +87,17 @@ export const updateProfile = async (req, res) => {
     }
     if (req.body.removeResume === "true") {
 
-  const profile = await JobSeekerProfile.findOne({ userId: req.user._id });
+      const profile = await JobSeekerProfile.findOne({ userId: req.user._id });
 
-  if (profile?.resumeUrl) {
-    fs.unlink(profile.resumeUrl, (err) => {
-      if (err) console.log("Failed to delete resume file");
-    });
-  }
+      if (profile?.resumeUrl) {
+        fs.unlink(profile.resumeUrl, (err) => {
+          if (err) console.log("Failed to delete resume file");
+        });
+      }
 
-  updateData.resumeUrl = "";
-  updateData.resumeName = "";
-}
+      updateData.resumeUrl = "";
+      updateData.resumeName = "";
+    }
 
     const profile = await JobSeekerProfile.findOneAndUpdate(
       { userId: req.user._id },
@@ -120,31 +121,71 @@ export const updateProfile = async (req, res) => {
 export const getMyApplications = async (req, res) => {
   try {
 
+    // 1️⃣ Check if user exists from protect middleware
+    if (!req.user) {
+      return res.status(401).json({
+        success: false,
+        message: "Unauthorized: User not found in request"
+      });
+    }
+
+    // 2️⃣ Validate job seeker id
     const jobSeekerId = req.user._id;
 
-    const applications = await Application.find({ jobSeekerId })
-      .populate({
-        path: "jobId",
-        select: "title location salary requiredSkills companyId"
-      })
-      .populate({
-        path: "recruiterId",
-        select: "name email"
-      })
-      .sort({ appliedAt: -1 });
+    if (!jobSeekerId) {
+      return res.status(400).json({
+        success: false,
+        message: "Job seeker ID is missing"
+      });
+    }
 
+    console.log("Fetching applications for user:", jobSeekerId);
+
+    // 3️⃣ Fetch applications
+   const applications = await Application.find({ jobSeekerId })
+  .populate({
+    path: "jobId",
+    select: "title location salary requiredSkills companyId",
+    populate: {
+      path: "companyId",
+      model: "Company",
+      select: "companyName"
+    }
+  })
+  .populate({
+    path: "recruiterId",
+    select: "name email"
+  })
+  .sort({ appliedAt: -1 });
+      
+
+    // 4️⃣ Check if no applications found
+    if (!applications || applications.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "No applications found for this job seeker",
+        count: 0,
+        data: []
+      });
+    }
+
+    // 5️⃣ Success response
     res.status(200).json({
+      success: true,
+      message: "Applications fetched successfully",
       count: applications.length,
       data: applications
     });
 
   } catch (error) {
 
-    console.error(error);
+    console.error("Error fetching applications:", error);
 
     res.status(500).json({
-      message: "Failed to fetch applications",
-      error: error.message
+      success: false,
+      message: "Server error while fetching applications",
+      error: error.message,
+      stack: process.env.NODE_ENV === "development" ? error.stack : undefined
     });
 
   }

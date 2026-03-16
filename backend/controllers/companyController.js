@@ -4,34 +4,24 @@ import Job from "../models/Job.js";
 
 // CREATE COMPANY
 export const createCompany = async (req, res) => {
-
   try {
-
     const userId = req.user._id; // from auth middleware
-
     // Check if recruiter already has company
     const existingCompany = await Company.findOne({ userId });
-
     if (existingCompany) {
-
       return res.status(400).json({
         message: "Recruiter already has a registered company"
       });
 
     }
-
-
     const company = await Company.create({
       userId,
       ...req.body
     });
-
-
     res.status(201).json({
       message: "Company created successfully",
       company
     });
-
   }
   catch (error) {
 
@@ -39,9 +29,7 @@ export const createCompany = async (req, res) => {
       message: "Failed to create company",
       error: error.message
     });
-
   }
-
 };
 
 
@@ -144,9 +132,7 @@ export const getCompanyById = async (req, res) => {
 };
 
 export const getCompanyJobs = async (req, res) => {
-
   try {
-
     const { id } = req.params;
 
     const jobs = await Job.find({
@@ -160,14 +146,10 @@ export const getCompanyJobs = async (req, res) => {
       count: jobs.length,
       data: jobs
     });
-
   } catch (error) {
-
     res.status(500).json({
       message: "Failed to fetch company jobs",
       error: error.message
     });
-
   }
-
 };

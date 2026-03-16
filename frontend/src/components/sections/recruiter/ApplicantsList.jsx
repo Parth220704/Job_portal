@@ -9,6 +9,7 @@ function ApplicantsList({ job, goBack }) {
     fetchApplicants();
   }, []);
 
+
   const fetchApplicants = async () => {
     try {
       const res = await getApplicantsByJob(job._id);
@@ -34,6 +35,7 @@ function ApplicantsList({ job, goBack }) {
     rejected: applicants.filter(a => a.status === "rejected").length
   };
 
+  console.log(applicants);
   return (
     <div className="p-6">
 
@@ -116,7 +118,8 @@ function ApplicantsList({ job, goBack }) {
 
                 {app.profile?.resumeUrl ? (
                   <a
-                    href={app.profile.resumeUrl}
+                    //href={app.profile.resumeUrl}
+                    href={`http://localhost:5000/${app.profile.resumeUrl}`}
                     target="_blank"
                     rel="noreferrer"
                     className="hover:underline"
