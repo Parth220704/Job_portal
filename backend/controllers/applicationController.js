@@ -1,5 +1,6 @@
 import Application from "../models/Application.js";
 import Job from "../models/Job.js";
+import { sendEmail } from "../utils/sendEmail.js";
 
 
 /*
@@ -116,7 +117,9 @@ export const updateApplicationStatus = async (req, res) => {
     const { id } = req.params;
     const { status } = req.body;
 
-    const application = await Application.findById(id);
+    const application = await Application.findById(id)
+      .populate("jobId", "title")
+      .populate("jobSeekerId", "name email");
 
     if (!application) {
       return res.status(404).json({
@@ -125,11 +128,29 @@ export const updateApplicationStatus = async (req, res) => {
     }
 
     application.status = status;
-
     await application.save();
 
+    // 🔥 Send Email
+    const userEmail = application.jobSeekerId.email;
+    const userName = application.jobSeekerId.name;
+    const jobTitle = application.jobId.title;
+
+    let message = "";
+
+    if (status === "shortlisted") {
+      message = `Hi ${userName},\n\nCongratulations! 🎉\nYou have been shortlisted for the position: ${jobTitle}.\n\nBest of luck!\nCareerBridge Team`;
+    } else if (status === "rejected") {
+      message = `Hi ${userName},\n\nWe regret to inform you that your application for ${jobTitle} was not selected.\n\nKeep trying, best wishes!\nCareerBridge Team`;
+    }
+
+    await sendEmail(
+      userEmail,
+      "Application Status Update",
+      message
+    );
+
     res.status(200).json({
-      message: "Application status updated",
+      message: "Application status updated and email sent",
       data: application
     });
 

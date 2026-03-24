@@ -9,6 +9,8 @@ import companyRoutes from "../routes/companyRoutes.js";
 import jobRoutes from "../routes/jobRoutes.js";
 import applicationRoutes from "../routes/applicationRoutes.js";
 import jobSeekerProfileRoutes from "../routes/jobSeekerProfileRoutes.js";
+import adminRoutes from "../routes/adminRoutes.js";
+import { startJobExpiryCron } from "../cron/jobExpiryCron.js";
 
 dotenv.config();
 
@@ -28,6 +30,8 @@ app.use("/api/applications", applicationRoutes);
 app.use("/api/jobseeker-profile", jobSeekerProfileRoutes);
 app.use("/uploads", express.static("uploads"));
 
+app.use("/api/admin", adminRoutes);
+
 
 app.get("/", (req, res) => {
   res.send("Backend is running...");
@@ -35,6 +39,7 @@ app.get("/", (req, res) => {
 
 
 connectDB().then(() => {
+  startJobExpiryCron(); // Start the cron job for expiring jobs
   app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
   });

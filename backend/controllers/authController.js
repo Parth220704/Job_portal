@@ -116,3 +116,60 @@ export const loginUser = async (req, res) => {
     });
   }
 };
+
+// ================= GET ALL COMPANIES =================
+export const getAllCompanies = async (req, res) => {
+  try {
+    const companies = await Company.find()
+      .populate("userId", "name email status");
+
+    res.status(200).json({
+      count: companies.length,
+      data: companies
+    });
+
+  } catch (error) {
+    res.status(500).json({
+      message: "Failed to fetch companies",
+      error: error.message
+    });
+  }
+};
+
+
+// ================= UPDATE COMPANY STATUS =================
+export const updateCompanyStatus = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { status } = req.body; // active / inactive
+
+    const company = await Company.findById(id);
+
+    if (!company) {
+      return res.status(404).json({
+        message: "Company not found"
+      });
+    }
+
+    // Update company status
+    company.status = status;
+    await company.save();
+
+    // 🔥 Update all jobs of this company
+    await Job.updateMany(
+      { companyId: company._id },
+      { status: status === "inactive" ? "inactive" : "active" }
+    );
+
+    res.status(200).json({
+      message: "Company status updated successfully",
+      data: company
+    });
+
+  } catch (error) {
+    res.status(500).json({
+      message: "Failed to update company status",
+      error: error.message
+    });
+  }
+};
