@@ -1,6 +1,9 @@
 import JobSeekerProfile from "../models/JobSeeker.js";
 import fs from "fs";
 import Application from "../models/Application.js";
+import Skill from "../models/Skills.js";
+import { extractResumeText } from "../services/resumeTextExtractor.js";
+import { enrichProfileFromResume } from "../services/matchingService.js";
 
 
 /*
@@ -80,10 +83,29 @@ export const updateProfile = async (req, res) => {
 
     // If resume uploaded
     if (req.file) {
-      if (req.file) {
-        updateData.resumeUrl = req.file.path;
-        updateData.resumeName = req.file.originalname;
-      }
+      updateData.resumeUrl = req.file.path;
+      updateData.resumeName = req.file.originalname;
+
+      const resumeText = await extractResumeText(req.file.path);
+      const knownSkillDocs = await Skill.find().select("name");
+      const knownSkills = knownSkillDocs.map((item) => item.name);
+
+      const parsedFields = enrichProfileFromResume({
+        resumeText,
+        knownSkills
+      });
+
+      const manualSkills = updateData.skills || [];
+      const parsedSkills = parsedFields.parsedSkills || [];
+      const mergedSkills = [
+        ...new Set([...manualSkills, ...parsedSkills])
+      ];
+
+      updateData = {
+        ...updateData,
+        ...parsedFields,
+        skills: mergedSkills
+      };
     }
     if (req.body.removeResume === "true") {
 
@@ -97,6 +119,10 @@ export const updateProfile = async (req, res) => {
 
       updateData.resumeUrl = "";
       updateData.resumeName = "";
+      updateData.parsedSkills = [];
+      updateData.parsedExperienceYears = 0;
+      updateData.parsedResumeText = "";
+      updateData.resumeParsedAt = null;
     }
 
     const profile = await JobSeekerProfile.findOneAndUpdate(

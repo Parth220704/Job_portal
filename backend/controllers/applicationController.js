@@ -1,6 +1,8 @@
 import Application from "../models/Application.js";
 import Job from "../models/Job.js";
+import JobSeekerProfile from "../models/JobSeeker.js";
 import { sendEmail } from "../utils/sendEmail.js";
+import { scoreJobsForProfile } from "../services/matchingService.js";
 
 
 /*
@@ -44,10 +46,16 @@ export const applyForJob = async (req, res) => {
     }
 
     // Create application
+    const [scoredJob] = await scoreJobsForProfile({
+      profile,
+      jobs: [job]
+    });
+
     const application = await Application.create({
       jobId,
       jobSeekerId,
-      recruiterId: job.recruiterId
+      recruiterId: job.recruiterId,
+      matchPercentage: scoredJob?.matchPercentage || 0
     });
 
     res.status(201).json({
@@ -68,8 +76,6 @@ export const applyForJob = async (req, res) => {
 /*
   Get Applicants for a Specific Job (Recruiter)
 */
-
-import JobSeekerProfile from "../models/JobSeeker.js";
 
 export const getApplicantsByJob = async (req, res) => {
   try {

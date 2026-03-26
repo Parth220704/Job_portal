@@ -75,6 +75,23 @@ const jobSeekerProfileSchema = new mongoose.Schema({
   type: String
 },
 
+  parsedSkills: [String],
+
+  parsedExperienceYears: {
+    type: Number,
+    default: 0
+  },
+
+  parsedResumeText: {
+    type: String,
+    default: ""
+  },
+
+  resumeParsedAt: {
+    type: Date,
+    default: null
+  },
+
   createdAt: {
     type: Date,
     default: Date.now

@@ -3,6 +3,7 @@ import express from "express";
 import {
   createJob,
   getAllJobs,
+  getMatchedJobsForMe,
   getMyJobs,
   getJobById,
   updateJob,
@@ -17,13 +18,15 @@ const router = express.Router();
 // public
 router.get("/", getAllJobs);
 
-router.get("/:id", protect, getJobById);
-
-
 // recruiter only
 router.post("/", protect, createJob);
 
 router.get("/recruiter/my-jobs", protect, getMyJobs);
+
+// job seeker
+router.get("/matches/me", protect, getMatchedJobsForMe);
+
+router.get("/:id", protect, getJobById);
 
 router.put("/:id", protect, updateJob);
 

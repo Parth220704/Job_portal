@@ -103,6 +103,26 @@ export const getJobById = async (jobId) => {
 };
 
 
+/*
+========================================
+GET BEST MATCHED JOBS (Job Seeker)
+GET /api/jobs/matches/me
+========================================
+*/
+export const getMatchedJobs = async () => {
+  try {
+    const response = await api.get("/jobs/matches/me");
+    return response.data;
+  } catch (error) {
+    if (error.response?.data?.message) {
+      throw new Error(error.response.data.message);
+    }
+
+    throw new Error("Failed to fetch matched jobs");
+  }
+};
+
+
 
 /*
 ========================================

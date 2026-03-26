@@ -2,6 +2,7 @@ import Job from "../models/Job.js";
 import Company from "../models/Company.js";
 import Skill from "../models/Skills.js";
 import JobSeekerProfile from "../models/JobSeeker.js";
+import { scoreJobsForProfile } from "../services/matchingService.js";
 
 
 // CREATE JOB
@@ -67,10 +68,7 @@ export const getAllJobs = async (req, res) => {
 
     // filter by skill
     if (skill) {
-      // filter by skill
-      if (skill) {
-        filter.requiredSkills = { $elemMatch: { $regex: skill, $options: "i" } };
-      }
+      filter.requiredSkills = { $elemMatch: { $regex: skill, $options: "i" } };
     }
 
     // filter by location
@@ -169,11 +167,21 @@ export const getJobById = async (req, res) => {
       name: { $in: missingSkills }
     });
 
-    // percentage calculation
-    const matchPercentage =
+    let matchPercentage =
       requiredSkills.length === 0
         ? 0
         : Math.round((matchedSkills.length / requiredSkills.length) * 100);
+
+    if (profile) {
+      const [scored] = await scoreJobsForProfile({
+        profile,
+        jobs: [job]
+      });
+
+      if (scored?.matchPercentage >= 0) {
+        matchPercentage = scored.matchPercentage;
+      }
+    }
 
     res.json({
       job,
@@ -192,6 +200,51 @@ export const getJobById = async (req, res) => {
       error: error.message
     });
 
+  }
+};
+
+
+// GET BEST MATCHED JOBS FOR LOGGED JOB SEEKER
+export const getMatchedJobsForMe = async (req, res) => {
+  try {
+    const profile = await JobSeekerProfile.findOne({ userId: req.user._id });
+
+    if (!profile) {
+      return res.status(404).json({
+        message: "Profile not found. Please complete profile first"
+      });
+    }
+
+    if (!profile.resumeUrl) {
+      return res.status(400).json({
+        message: "Please upload a resume first to see matched jobs"
+      });
+    }
+
+    const jobs = await Job.find({ status: "active" })
+      .populate("companyId", "companyName location")
+      .sort({ createdAt: -1 });
+
+    const scoredJobs = await scoreJobsForProfile({
+      profile,
+      jobs
+    });
+
+    res.json({
+      count: scoredJobs.length,
+      data: scoredJobs.map((item) => ({
+        job: item.job,
+        matchedSkills: item.matchedSkills,
+        missingSkills: item.missingSkills,
+        matchPercentage: item.matchPercentage,
+        scoreBreakdown: item.scoreBreakdown
+      }))
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "Failed to fetch matched jobs",
+      error: error.message
+    });
   }
 };
 

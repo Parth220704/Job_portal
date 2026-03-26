@@ -54,7 +54,7 @@ const Navbar = () => {
 
           {/* Left */}
           <div className="flex items-center gap-3">
-            <div className="h-10 w-10 flex items-center justify-center rounded-lg bg-gradient-to-r from-blue-600 to-teal-500 text-white">
+            <div className="h-10 w-10 flex items-center justify-center rounded-lg bg-linear-to-r from-blue-600 to-teal-500 text-white">
               <FiBriefcase size={22} />
             </div>
 
@@ -74,7 +74,10 @@ const Navbar = () => {
 
             {/* Logout */}
             <button
-              onClick={logout}
+              onClick={() => {
+                logout();
+                navigate("/login");
+              }}
               className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100 transition"
             >
               <FiLogOut size={18} />
