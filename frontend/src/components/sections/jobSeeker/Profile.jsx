@@ -3,6 +3,7 @@ import { AuthContext } from "../../../context/AuthContext";
 import { HiOutlineUser } from "react-icons/hi2";
 import { getSkillSuggestions } from "../../../api/skill";
 import { getMyProfile, updateProfile } from "../../../api/profile";
+import toast from "react-hot-toast";
 import {
   HiOutlineAcademicCap,
   HiOutlineTrash,
@@ -202,7 +203,7 @@ const Profile = () => {
     if (!file) return;
 
     if (file.type !== "application/pdf") {
-      alert("Only PDF files are allowed");
+      toast.error("Only PDF files are allowed");
       return;
     }
 
@@ -238,10 +239,9 @@ const Profile = () => {
       form.append("removeResume", removeResume);
 
       await updateProfile(form);
-
-      alert("Profile updated successfully");
+      toast.success("Profile updated successfully");
     } catch (error) {
-      alert(error.message);
+      toast.error(error.message || "Failed to update profile");
     }
   };
 

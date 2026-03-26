@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { getApplicantsByJob, updateApplicationStatus } from "../../../api/application";
 import { FaArrowLeft, FaUser, FaFileAlt, FaClock } from "react-icons/fa";
+import toast from "react-hot-toast";
 
 function ApplicantsList({ job, goBack }) {
   const [applicants, setApplicants] = useState([]);
@@ -13,19 +14,32 @@ function ApplicantsList({ job, goBack }) {
   const fetchApplicants = async () => {
     try {
       const res = await getApplicantsByJob(job._id);
-      console.log("Applicants:", res);
       setApplicants(res.data.data);
     } catch (error) {
       console.error("Error fetching applicants:", error);
+      toast.error("Failed to load applicants");
     }
   };
 
   const handleStatusChange = async (id, status) => {
+    const previousApplicants = [...applicants];
+
+    // Optimistic UI update for immediate feedback
+    setApplicants((prev) =>
+      prev.map((app) =>
+        app._id === id ? { ...app, status } : app
+      )
+    );
+
     try {
       await updateApplicationStatus(id, status);
-      fetchApplicants();
+      toast.success(`Application ${status}`);
     } catch (error) {
       console.error("Error updating status:", error);
+
+      // Rollback if API fails
+      setApplicants(previousApplicants);
+      toast.error("Failed to update application status");
     }
   };
 
@@ -35,7 +49,6 @@ function ApplicantsList({ job, goBack }) {
     rejected: applicants.filter(a => a.status === "rejected").length
   };
 
-  console.log(applicants);
   return (
     <div className="p-6">
 

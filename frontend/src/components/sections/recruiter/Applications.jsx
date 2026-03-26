@@ -3,6 +3,7 @@ import { FaUsers } from "react-icons/fa";
 import { getMyJobs } from "../../../api/job";
 import ApplicantsList from "./ApplicantsList";
 import { useLocation } from "react-router-dom";
+import toast from "react-hot-toast";
 
 function Applications() {
   const [jobs, setJobs] = useState([]);
@@ -13,8 +14,12 @@ function Applications() {
   }, []);
 
   const fetchJobs = async () => {
-    const res = await getMyJobs();
-    setJobs(res);
+    try {
+      const res = await getMyJobs();
+      setJobs(res);
+    } catch (error) {
+      toast.error("Failed to load recruiter jobs");
+    }
   };
   useEffect(() => {
   const storedJob = sessionStorage.getItem("selectedJob");

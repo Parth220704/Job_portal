@@ -19,6 +19,7 @@ import {
 } from "react-icons/hi2";
 
 import { FaLinkedin, FaTwitter } from "react-icons/fa";
+import toast from "react-hot-toast";
 
 
 const CompanyProfile = () => {
@@ -142,22 +143,19 @@ const CompanyProfile = () => {
         const updated = await updateCompany(formData);
 
         setCompany(updated);
-
-        alert("Company updated successfully");
+        toast.success("Company updated successfully");
 
       } else {
 
         const created = await createCompany(formData);
 
         setCompany(created);
-
-        alert("Company created successfully");
+        toast.success("Company created successfully");
 
       }
 
     } catch (error) {
-
-      alert(error.message);
+      toast.error(error.message || "Failed to save company profile");
 
     }
 
@@ -428,7 +426,7 @@ const CompanyProfile = () => {
             {/* Submit */}
             <button
               type="submit"
-              className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-2 rounded-lg font-medium hover:opacity-90"
+              className="w-full bg-linear-to-r from-blue-600 to-indigo-600 text-white py-2 rounded-lg font-medium hover:opacity-90"
             >
               {company
                 ? "Update Company Profile"

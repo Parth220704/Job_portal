@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { getMyCompany } from "../../../api/company";
 import { createJob } from "../../../api/job";
 import { getSkillSuggestions } from "../../../api/skill";
+import toast from "react-hot-toast";
 
 import {
   HiOutlineExclamationCircle,
@@ -174,8 +175,7 @@ const PostJob = () => {
 
     try {
       const response = await createJob(formData);
-
-      alert(response.message || "Job Posted Successfully");
+      toast.success(response.message || "Job posted successfully");
 
       setFormData({
         title: "",
@@ -191,6 +191,7 @@ const PostJob = () => {
       navigate("/dashboard");
     } catch (err) {
       setError(err.message);
+      toast.error(err.message || "Failed to post job");
     }
   };
 

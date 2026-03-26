@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 
 import { getMyJobs, deleteJob } from "../../../api/job";
 
@@ -30,6 +31,7 @@ const MyJobs = () => {
       setJobs(data);
     } catch (error) {
       console.error(error);
+      toast.error("Failed to load jobs");
     } finally {
       setLoading(false);
     }
@@ -41,9 +43,10 @@ const MyJobs = () => {
     try {
       await deleteJob(jobId);
 
+      toast.success("Job deleted successfully");
       fetchJobs();
     } catch (error) {
-      alert(error.message);
+      toast.error(error.message || "Failed to delete job");
     }
   };
 

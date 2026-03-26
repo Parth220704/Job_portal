@@ -3,6 +3,7 @@ import { getAllJobs } from "../../../api/job";
 import { getMyProfile,getMyApplications } from "../../../api/profile";
 import { applyForJob } from "../../../api/application"; // 👈 new
 import { AuthContext } from "../../../context/AuthContext";
+import toast from "react-hot-toast";
 import {
   HiOutlineMapPin,
   HiOutlineBriefcase,
@@ -31,8 +32,12 @@ const BrowseJobs = () => {
   }, []);
 
   const loadJobs = async () => {
-    const data = await getAllJobs();
-    setJobs(data.data);
+    try {
+      const data = await getAllJobs();
+      setJobs(data.data);
+    } catch (error) {
+      toast.error("Failed to load jobs");
+    }
   };
 
   const loadProfile = async () => {
@@ -41,6 +46,7 @@ const BrowseJobs = () => {
       setProfile(data);
     } catch {
       setProfile(null);
+      toast.error("Failed to load profile");
     }
   };
 
@@ -54,6 +60,7 @@ const loadMyApplications = async () => {
   } catch (err) {
     console.error("Failed to load applications:", err);
     setAppliedJobIds(new Set());
+    toast.error("Failed to load applications");
   }
 };
 
@@ -69,6 +76,7 @@ const loadMyApplications = async () => {
       setJobs(data.data);
     } catch (error) {
       console.log(error);
+      toast.error("Failed to fetch jobs");
     } finally {
       setLoading(false);
     }
@@ -84,9 +92,10 @@ const loadMyApplications = async () => {
       setApplyingJobId(jobId);
       await applyForJob(jobId);
       setAppliedJobIds((prev) => new Set([...prev, jobId])); // mark as applied locally
+      toast.success("Application submitted successfully");
     } catch (error) {
       console.error(error);
-      alert(error?.response?.data?.message || "Failed to apply");
+      toast.error(error?.response?.data?.message || "Failed to apply");
     } finally {
       setApplyingJobId(null);
     }

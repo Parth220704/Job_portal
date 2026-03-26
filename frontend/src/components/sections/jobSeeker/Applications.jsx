@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { getMyApplications } from "../../../api/profile";
 import { FaBriefcase, FaMapMarkerAlt, FaCalendarAlt, FaMoneyBillWave, FaUserTie } from "react-icons/fa";
+import toast from "react-hot-toast";
 
 function Applications() {
 
@@ -17,9 +18,9 @@ function Applications() {
       setApplications(res.data);
     } catch (error) {
       console.error(error);
+      toast.error("Failed to load applications");
     }
   };
-console.log(applications);
 
   return (
     <div className="max-w-6xl mx-auto p-6">

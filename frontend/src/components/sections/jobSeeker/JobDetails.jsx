@@ -1,6 +1,9 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { getJobById } from "../../../api/job";
+import { applyForJob } from "../../../api/application";
+import { getMyApplications } from "../../../api/profile";
+import toast from "react-hot-toast";
 
 import {
   HiOutlineBuildingOffice,
@@ -19,22 +22,58 @@ const JobDetails = () => {
   const [resources, setResources] = useState([]);
   const [matchPercentage, setMatchPercentage] = useState(0);
   const [profile, setProfile] = useState(null);
+    const [appliedJobIds, setAppliedJobIds] = useState(new Set()); // 👈 track applied
+  const [applyingJobId, setApplyingJobId] = useState(null);   
 
   useEffect(() => {
     loadJob();
+    loadMyApplications();
   }, []);
 
-  const loadJob = async () => {
-    const data = await getJobById(id);
+  const loadMyApplications = async () => {
+    try {
+      const res = await getMyApplications();
+      const applications = res?.data || [];
+      const ids = new Set(applications.map((app) => app.jobId?._id ?? app.jobId));
+      setAppliedJobIds(ids);
+    } catch {
+      setAppliedJobIds(new Set());
+    }
+  };
 
-    setJob(data.job);
-    setMatchedSkills(data.matchedSkills);
-    setResources(data.resources);
-    setMatchPercentage(data.matchPercentage);
-    setProfile(data.profile);
+  const loadJob = async () => {
+    try {
+      const data = await getJobById(id);
+
+      setJob(data.job);
+      setMatchedSkills(data.matchedSkills);
+      setResources(data.resources);
+      setMatchPercentage(data.matchPercentage);
+      setProfile(data.profile);
+    } catch (error) {
+      toast.error(error.message || "Failed to load job details");
+    }
+  };
+
+    // 👇 Handle apply click
+  const handleApply = async (jobId) => {
+    try {
+      setApplyingJobId(jobId);
+      await applyForJob(jobId);
+      setAppliedJobIds((prev) => new Set([...prev, jobId])); // mark as applied locally
+      toast.success("Application submitted successfully");
+    } catch (error) {
+      console.error(error);
+      toast.error(error?.response?.data?.message || "Failed to apply");
+    } finally {
+      setApplyingJobId(null);
+    }
   };
 
   if (!job) return null;
+
+  const alreadyApplied = appliedJobIds.has(job._id);
+  const isApplying = applyingJobId === job._id;
 
   return (
     <div className="max-w-4xl mx-auto p-6">
@@ -168,13 +207,26 @@ const JobDetails = () => {
       {/* Apply Button */}
 
       {profile?.resumeUrl ? (
-        <button className="bg-green-600 text-white px-6 py-3 rounded">
-          Apply Now
-        </button>
+        alreadyApplied ? (
+          <button
+            disabled
+            className="mt-4 w-auto bg-gray-100 text-gray-500 px-4 py-2 rounded-md text-sm cursor-not-allowed"
+          >
+            Applied
+          </button>
+        ) : (
+          <button
+            onClick={() => handleApply(job._id)}
+            disabled={isApplying}
+            className="mt-4 w-auto bg-blue-600 text-white px-4 py-2 rounded-md text-sm hover:bg-blue-700 disabled:opacity-60"
+          >
+            {isApplying ? "Applying..." : "Apply Job"}
+          </button>
+        )
       ) : (
         <button
           disabled
-          className="border border-red-500 text-red-500 px-6 py-3 rounded"
+          className="mt-4 border border-red-500 text-red-500 px-4 py-2 rounded-md text-sm"
         >
           Upload Resume to Apply
         </button>
