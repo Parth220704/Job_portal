@@ -2,6 +2,7 @@ import Job from "../models/Job.js";
 import Company from "../models/Company.js";
 import Skill from "../models/Skills.js";
 import JobSeekerProfile from "../models/JobSeeker.js";
+import Application from "../models/Application.js";
 import { scoreJobsForProfile } from "../services/matchingService.js";
 
 
@@ -221,7 +222,18 @@ export const getMatchedJobsForMe = async (req, res) => {
       });
     }
 
-    const jobs = await Job.find({ status: "active" })
+    const appliedApplications = await Application.find({
+      jobSeekerId: req.user._id
+    }).select("jobId");
+
+    const appliedJobIds = appliedApplications
+      .map((app) => app.jobId)
+      .filter(Boolean);
+
+    const jobs = await Job.find({
+      status: "active",
+      _id: { $nin: appliedJobIds }
+    })
       .populate("companyId", "companyName location")
       .sort({ createdAt: -1 });
 
