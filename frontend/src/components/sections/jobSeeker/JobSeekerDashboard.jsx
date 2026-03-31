@@ -23,6 +23,8 @@ const JobSeekerDashboard = ({ user }) => {
             icon={<HiOutlineUser size={22} />}
             title="Profile Information"
             description="Your account details"
+            button="Edit Profile"
+            to="/jobseeker/profile"
           >
             <Info label="Full Name" value={user?.name} />
             <Info label="Email" value={user?.email} />
@@ -74,18 +76,6 @@ const JobSeekerDashboard = ({ user }) => {
             </p>
           </DashboardCard>
 
-          {/* My Profile */}
-          <DashboardCard
-            icon={<HiOutlineUser size={22} />}
-            title="My Profile"
-            description="Manage your skills & info"
-            button="Edit Profile"
-            to="/jobseeker/profile"
-          >
-            <p className="text-gray-600 text-sm">
-              Update your profile and skills for better matches.
-            </p>
-          </DashboardCard>
         </div>
       </div>
     </div>

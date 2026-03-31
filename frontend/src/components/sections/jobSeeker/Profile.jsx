@@ -60,11 +60,12 @@ const Profile = () => {
         setSkills(data.skills || []);
         setEducation(data.education || []);
         setExperience(data.experience || []);
-        setResumeFile(
-          data.resumeUrl
-            ? { name: data.resumeName.split("/").pop(), url: data.resumeUrl }
-            : null,
-        );
+        if (data.resumeUrl) {
+          const displayName = data.resumeName || data.resumeUrl.split("/").pop();
+          setResumeFile({ name: displayName, url: data.resumeUrl });
+        } else {
+          setResumeFile(null);
+        }
       } catch (error) {
         console.log("Profile not found yet");
       }
@@ -208,11 +209,13 @@ const Profile = () => {
     }
 
     setResumeFile(file);
+    setRemoveResume(false);
   };
 
   const deleteResume = () => {
     setResumeFile(null);
     setRemoveResume(true);
+    setSkills([]);
   };
 
   /* ==============================
@@ -233,13 +236,38 @@ const Profile = () => {
       form.append("education", JSON.stringify(education));
       form.append("experience", JSON.stringify(experience));
 
-      if (resumeFile) {
+      if (resumeFile && resumeFile instanceof File) {
         form.append("resume", resumeFile);
       }
-      form.append("removeResume", removeResume);
+      form.append("removeResume", removeResume ? "true" : "false");
 
-      await updateProfile(form);
-      toast.success("Profile updated successfully");
+      const response = await updateProfile(form);
+      const updatedProfile = response?.data;
+
+      if (updatedProfile) {
+        setFormData((prev) => ({
+          ...prev,
+          phone: updatedProfile.phone || "",
+          city: updatedProfile.city || "",
+          gender: updatedProfile.gender || "",
+          dob: updatedProfile.DOB ? updatedProfile.DOB.split("T")[0] : "",
+        }));
+
+        setSummary(updatedProfile.summary || "");
+        setSkills(updatedProfile.skills || []);
+        setEducation(updatedProfile.education || []);
+        setExperience(updatedProfile.experience || []);
+
+        if (updatedProfile.resumeUrl) {
+          const displayName = updatedProfile.resumeName || updatedProfile.resumeUrl.split("/").pop();
+          setResumeFile({ name: displayName, url: updatedProfile.resumeUrl });
+        } else {
+          setResumeFile(null);
+        }
+      }
+
+      setRemoveResume(false);
+      toast.success(response?.message || "Profile updated successfully");
     } catch (error) {
       toast.error(error.message || "Failed to update profile");
     }
@@ -593,13 +621,17 @@ const Profile = () => {
         {/* Resume File Display */}
         {resumeFile && (
           <div className="flex items-center justify-between border rounded-lg px-4 py-2">
-            <a
-              href={`http://localhost:5000/${resumeFile.url}`}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              {resumeFile.name}
-            </a>
+            {resumeFile.url ? (
+              <a
+                href={`http://localhost:5000/${resumeFile.url}`}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {resumeFile.name}
+              </a>
+            ) : (
+              <span>{resumeFile.name}</span>
+            )}
 
             <button
               onClick={deleteResume}

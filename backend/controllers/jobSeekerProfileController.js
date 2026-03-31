@@ -95,16 +95,17 @@ export const updateProfile = async (req, res) => {
         knownSkills
       });
 
-      const manualSkills = updateData.skills || [];
-      const parsedSkills = parsedFields.parsedSkills || [];
-      const mergedSkills = [
-        ...new Set([...manualSkills, ...parsedSkills])
-      ];
+      const normalizedParsedSkills = [...new Set(
+        (parsedFields?.parsedSkills || [])
+          .map((skill) => skill?.toString().trim())
+          .filter(Boolean)
+      )];
 
       updateData = {
         ...updateData,
         ...parsedFields,
-        skills: mergedSkills
+        skills: normalizedParsedSkills,
+        parsedSkills: normalizedParsedSkills
       };
     }
     if (req.body.removeResume === "true") {
@@ -123,6 +124,7 @@ export const updateProfile = async (req, res) => {
       updateData.parsedExperienceYears = 0;
       updateData.parsedResumeText = "";
       updateData.resumeParsedAt = null;
+      updateData.skills = [];
     }
 
     const profile = await JobSeekerProfile.findOneAndUpdate(

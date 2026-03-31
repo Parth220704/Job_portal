@@ -111,9 +111,10 @@ export const enrichProfileFromResume = ({
 }) => {
   const extractedSkills = extractSkillsFromText(resumeText, knownSkills);
   const parsedExperienceYears = parseYearsFromText(resumeText);
+  const uniqueParsedSkills = [...new Set((extractedSkills || []).map((skill) => skill?.trim()).filter(Boolean))];
 
   return {
-    parsedSkills: extractedSkills,
+    parsedSkills: uniqueParsedSkills,
     parsedExperienceYears,
     parsedResumeText: resumeText?.slice(0, 50000) || "",
     resumeParsedAt: new Date()
